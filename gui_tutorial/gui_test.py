@@ -6,6 +6,9 @@ import os
 from termcolor import colored
 import sys
 
+def callback1(entry_object):
+    print(entry_object.get())
+
 def callback2():
     print(1 + 1)
 
@@ -44,6 +47,30 @@ def create_label(frame, text_label, row_label, col_label, caption=False):
         sys.exit()
     return label_handle
 
+def create_entry(frame, width_entry, row_entry, col_entry):
+        # Entry = Eingabefeld
+        E1 = Entry(frame, width=width_entry)    # Breite wird in Zeichen angegeben
+        E1.grid(row=row_entry, column=col_entry, padx=10, pady=3)
+        return E1
+
+def create_button(frame, button_text, color, callback, row_button, col_button, parameter_callback=False):
+    # Callbacks = function-pointers in C++ -> ich uebergebe die Funktion an die Funktion weiter. Die Funktion die den Callback aufruft entscheidet dann was sie mit dem Function-Pointer anfaengt
+    # https://effbot.org/zone/tkinter-callbacks.htm -> Erklaerung callbacks und callbacks mit Uebergabeparametern
+    if color == "red":
+        color_rgb = "#FF0000"
+    elif color == "yellow":
+        color_rgb = "#FFFF00"
+    else:
+        color_rgb = "#8a2be2"
+
+    if parameter_callback == False:
+        B2 = Button(frame, text=button_text, bg=color_rgb, width=15, command=callback)
+        B2.grid(row=row_button, column=col_button, padx=10, pady=3)
+    else:
+        B1 = Button(frame, text=button_text, bg=color_rgb, width=15, command=lambda: callback1(parameter_callback))
+        B1.grid(row=row_button, column=col_button, padx=10, pady=3)
+
+
 def insert_image(frame, row_frame, col_frame, path_to_img, size_w, size_h):
         # lade bild mit PIL
     img = Image.open(path_to_img)
@@ -66,30 +93,22 @@ def main():
     label_left_1 = create_label(left_frame, "Hier kommt die GUI", 0, 0, True)
     label_left_2 = create_label(left_frame, "Dieses Bild zeigt\nden neuen Audi R8:", 1, 0)
 
-    #img = Image.open("/home/jens/Schreibtisch/rasperry_pi/software/2019-audi-r8-v10-performance-looks-brutal-in-yellow-130641_1.jpg")
-    #img = img.resize((200, 150), Image.ANTIALIAS)
+    img = Image.open("/home/jens/Schreibtisch/rasperry_pi/software/2019-audi-r8-v10-performance-looks-brutal-in-yellow-130641_1.jpg")
+    img = img.resize((200, 150), Image.ANTIALIAS)
         # rescale image
-    #imageEx = ImageTk.PhotoImage(img)
+    imageEx = ImageTk.PhotoImage(img)
         # erstelle Tkinter bild-objekt
-    #Label(left_frame, image=imageEx).grid(row=2, column=0, padx=10, pady=3)
+    Label(left_frame, image=imageEx).grid(row=2, column=0, padx=10, pady=3)
+    #insert_image(left_frame, 2, 0, "/home/jens/Schreibtisch/rasperry_pi/software/2019-audi-r8-v10-performance-looks-brutal-in-yellow-130641_1.jpg", 200, 150)
 
-    insert_image(left_frame, 2, 0, "/home/jens/Schreibtisch/rasperry_pi/software/2019-audi-r8-v10-performance-looks-brutal-in-yellow-130641_1.jpg", 200, 150)
+    E1 = create_entry(right_frame, 50, 0, 0)
 
-        # Entry = Eingabefeld
-    E1 = Entry(right_frame, width=50)    # Breite wird in Zeichen angegeben
-    E1.grid(row=0, column=0, padx=10, pady=3)
+    # erstelle Frame fuer Button in Frame vorhandenem Frame
+    button_frame = Frame(right_frame)
+    button_frame.grid(row=1, column=0, padx=1, pady=3)
 
-    def callback1():
-        print(E1.get())
-
-    buttonFrame = Frame(right_frame)
-    buttonFrame.grid(row=1, column=0, padx=10, pady=3)
-
-    B1 = Button(buttonFrame, text="Button 1", bg="#FF0000", width=15, command=callback1)
-    B1.grid(row=0, column=0, padx=10, pady=3)
-
-    B2 = Button(buttonFrame, text="Button 2", bg="#FFFF00", width=15, command=callback2)
-    B2.grid(row=0, column=1, padx=10, pady=3)
+    create_button(button_frame, "Button 1", "red", callback1, 0, 0, parameter_callback=E1)
+    create_button(button_frame, "Button 2", "yellow", callback2, 0, 1)
 
     Slider = Scale(right_frame, from_=0, to=100, resolution=0.1, orient=HORIZONTAL, length=400)
     Slider.grid(row=2, column=0, padx=10, pady=3)
